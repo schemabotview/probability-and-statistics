@@ -1,0 +1,111 @@
+Welcome to notebook two — random variables and distributions. The English word variable is misleading. A random variable is not a variable. It is a function. Specifically, a function from the sample space omega to the real numbers.
+
+For a coin flip, the indicator random variable x of heads equals one, x of tails equals zero. It turns the abstract outcome into a number we can do arithmetic on. For two rolls of a die, the random variable x equal to first roll plus second roll takes values from two to twelve. Both inputs are abstract outcomes. The random variable extracts a numeric summary.
+
+Why bother? Because once outcomes are numbers, we can compute averages, variances, and run them through more functions. Every probabilistic model in machine learning is built on random variables — features x, labels y, parameters theta, hidden states z, all of them.
+
+A convention. Uppercase letters for random variables. Lowercase for specific values the random variable might take. So p of capital x equals little x reads — the probability that the random variable x takes the value little x.
+
+There are two flavors of random variables. A random variable is discrete if it can only take values in a finite or countable set — like zero one, or one through infinity, or words in a vocabulary. It is continuous if it ranges over an interval of the real line. These two flavors need slightly different machinery, but the ideas line up.
+
+Now to p m f, p d f, and c d f — the three functions that describe a distribution.
+
+A random variable does not really exist in isolation. It has a distribution, which is a description of how its values are spread. Three functions describe a distribution, depending on flavor.
+
+The probability mass function, p m f, is for discrete x. The p m f is p sub x of x, equal to the probability that x equals little x. P m f values are actual probabilities. They sum to one over all x. For a fair die, the p m f equals one sixth for k equal to one through six.
+
+The probability density function, p d f, is for continuous x. The p d f f sub x of x is not a probability. The probability that x equals any specific value is zero, because a continuous variable has infinitely many possible values. Instead the p d f describes probability per unit interval. The probability that x lies in an interval from a to b equals the integral, from a to b, of f sub x of x, d x.
+
+The p d f integrates to one over its support. It can be greater than one at any point. It is a density, not a probability. The familiar bell curve — one divided by the square root of two pi, times e to the negative x squared over two — is the standard normal p d f. It peaks at about zero point four, not one.
+
+The cumulative distribution function, c d f, works for both discrete and continuous random variables. The c d f is capital f sub x of x, equal to the probability that x is less than or equal to little x. The c d f starts at zero, monotonically increases to one, and ties together the discrete and continuous cases. Useful for sampling, for tail probabilities, and for testing.
+
+Relationships. For continuous x, the c d f is the integral from negative infinity to x of the p d f. And by the fundamental theorem of calculus from the calculus repo, the p d f equals the derivative of the c d f. For discrete x, the c d f is the sum of p m f values up to x. The c d f jumps at each value where the p m f is positive.
+
+The support is the set of values where the p m f or p d f is positive. The gaussian's support is the entire real line. The exponential's support is zero to infinity. The bernoulli's support is just zero and one.
+
+Now let us go through the distributions you will use most. We start with bernoulli and binomial.
+
+Bernoulli of p is the simplest distribution. X takes value one with probability p, and zero with probability one minus p. The p m f, written compactly, is p to the x, times one minus p to the one minus x — a slick way to write "p if x is one, one minus p if x is zero" in one formula.
+
+Binomial of n and p counts the number of successes in n independent bernoulli trials, each with success probability p. The p m f is n choose k, times p to the k, times one minus p to the n minus k, for k from zero to n. The binomial coefficient n choose k counts the number of ways to arrange k successes among n trials.
+
+A common confusion. Bernoulli is the single trial version. Binomial is the count over n trials version. Setting n equal to one recovers bernoulli.
+
+Machine learning usage. Binary classification labels are bernoulli. Logistic regression is maximum likelihood estimation for a bernoulli likelihood — that is why its loss is the negative log of p of y given x. The cross entropy loss for binary classification — negative y times log p hat, minus one minus y, times log of one minus p hat — is literally the negative log of the bernoulli p m f, written with p hat as the predicted parameter.
+
+Now categorical and multinomial. Categorical of p vector generalizes bernoulli to k outcomes. X takes value k from one to capital k, with probability p sub k. Where p is a probability vector — entries non negative, summing to one. The p m f is p sub x of k equals p sub k.
+
+In code, categorical values are usually represented as one hot vectors — a vector with a single one in the k-th slot and zeros elsewhere. This is what softmax outputs are intended to model.
+
+Multinomial of n and p vector counts how many times each of the k outcomes appears in n independent categorical draws. Y is a vector with components y sub k, summing to n. The p m f has a multinomial coefficient — n factorial divided by the product of n sub k factorial — multiplied by the product of p sub k to the n sub k.
+
+Machine learning usage. Multi class classification — the predicted distribution over k classes is exactly a categorical with predicted p hat. Cross entropy loss against a one hot target is the negative log likelihood of the categorical. Language modeling — each next token distribution is a categorical over the vocabulary.
+
+Now poisson and geometric. Poisson of lambda counts the number of events in a fixed time window, when events happen independently at average rate lambda. Support is zero, one, two, and so on. P m f is lambda to the k, times e to the negative lambda, divided by k factorial. Mean and variance both equal lambda.
+
+The poisson is the "events are rare but many opportunities" limit of the binomial. As n goes to infinity, p goes to zero, and n times p approaches lambda, the binomial converges to a poisson.
+
+Machine learning usage for poisson. Count data — word counts, click through events, fraud signals — are modeled as poisson. Poisson regression generalizes linear regression to count targets. Some attention variants use poisson processes for sparse attention patterns.
+
+Geometric of p counts the number of trials until the first success in a sequence of bernoulli trials. Support starts at one. P m f is one minus p to the k minus one, times p. Mean is one over p. It is the discrete analogue of the exponential distribution, which it converges to in the small time step limit.
+
+Machine learning usage for geometric. Modeling time to failure for systems. Reinforcement learning with discount factor gamma — a geometric distribution implicitly. Early stopping analysis.
+
+Now the continuous staples — uniform, exponential, gaussian, beta, and gamma.
+
+Uniform on a to b. Constant density on the interval, zero outside. The p d f equals one over b minus a, on the interval, and zero outside. Mean is a plus b over two. Variance is b minus a squared, divided by twelve. The flat distribution — your "I have no idea where it is in this range" prior.
+
+Exponential of lambda. Models waiting time between independent events arriving at rate lambda. Support is zero to infinity. The p d f equals lambda, times e to the negative lambda x. Mean is one over lambda. Variance is one over lambda squared. The exponential is memoryless — having already waited t time units does not change the distribution of remaining wait. We will show this in the next notebook.
+
+Gaussian, also called normal, of mu and sigma squared. The bell curve. The p d f is one over sigma, times the square root of two pi, all multiplied by the exponential of negative x minus mu, squared, divided by two sigma squared. Mean is mu. Variance is sigma squared. The single most important distribution in machine learning. Notebook five is dedicated to it.
+
+Beta of alpha and beta. Support is the interval from zero to one. P d f is proportional to x to the alpha minus one, times one minus x to the beta minus one. The natural distribution over probabilities. Flexible shape controlled by alpha and beta. Conjugate to the bernoulli. We will use it in notebook six.
+
+Gamma of alpha and beta. Support is zero to infinity. P d f is proportional to x to the alpha minus one, times e to the negative beta x. Generalizes the exponential at alpha equal to one. Models positive valued quantities. Conjugate to the poisson rate parameter.
+
+Finally, the exponential family — the meta pattern most ML distributions belong to. Most of the distributions above — bernoulli, binomial, poisson, gaussian, beta, gamma, exponential, categorical, dirichlet — share a common shape. P of x given eta, a vector of natural parameters, equals h of x, times the exponential of eta transpose, times t of x, minus the log partition function a of eta.
+
+The pieces. Eta is the natural parameters. T of x is the sufficient statistics. H of x is the base measure. And capital a of eta is the log partition function, which makes the density normalize.
+
+This is called the exponential family, and it is where probability gets really beautiful. Key properties.
+
+The sufficient statistic t of x summarizes the data perfectly. No information is lost by replacing x one through x n with the sum of t of x sub i.
+
+Each exponential family distribution has a conjugate prior that is also exponential family. We will see beta bernoulli and gaussian gaussian conjugacy in notebook six.
+
+The gradient of the log partition equals the expected sufficient statistic. This identity is the secret sauce of variational inference.
+
+Maximum likelihood is easy — the gradient of the log likelihood involves only the empirical sufficient statistics.
+
+In practice you do not need to chant the exponential family form every time. But knowing the framework explains why so many distributions feel related. They really are.
+
+Generalized linear models, abbreviated g l m's, are the bridge to machine learning. Linear regression uses gaussian. Logistic regression uses bernoulli. Poisson regression uses poisson. Softmax regression uses categorical. All of them are g l m's, with different exponential family choices. The link functions are inverses of the canonical parameter mappings.
+
+Let us close with where distributions appear in machine learning. They are the building blocks of probabilistic m l. Most architectures correspond to a choice of distribution for outputs and sometimes for latents.
+
+Logistic regression and binary cross entropy. The output is bernoulli with p hat. The loss is the negative log of p of y given x.
+
+Softmax classification and cross entropy. The output is categorical with p hat. The loss is again negative log likelihood.
+
+Regression with m s e. The output is gaussian with mean y hat and variance sigma squared. The m s e loss is the negative log likelihood, up to constants.
+
+Poisson regression for counts. Use a poisson output distribution with log lambda equal to w transpose, times x.
+
+Variational auto encoders. Encoder outputs a gaussian over the latent. Decoder outputs bernoulli for images, or gaussian for continuous data.
+
+Diffusion models. Each denoising step is a — usually gaussian — conditional distribution over the slightly less noisy version.
+
+Language models. Each next token distribution is categorical over the vocabulary. The temperature in sampling literally rescales the natural parameters.
+
+Latent dirichlet allocation, l d a. Documents are mixtures of topics drawn from dirichlets. Words are drawn from categoricals.
+
+Gaussian processes. The output at every input is jointly gaussian. Leans on the multivariate gaussian for everything.
+
+Mixture models, like gaussian mixture models. Probabilistic clustering with weighted sums of distributions, usually gaussian.
+
+Bayesian neural networks. Treat weights as random variables. Specify priors, often gaussian. Compute approximate posteriors.
+
+Reinforcement learning. Policies are distributions over actions. Rewards have distributions. Value functions are expectations.
+
+The next notebook covers expectation, variance, and moments. How we summarize distributions with a few key numbers. And the identities — linearity, the law of the unconscious statistician, covariance — that you will lean on for the rest of the repo.

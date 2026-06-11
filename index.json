@@ -1,0 +1,32 @@
+{
+  "sections": [
+    {
+      "title": "Getting Started",
+      "notebooks": [
+        "01-intro-and-probability-axioms"
+      ]
+    },
+    {
+      "title": "Random Variables & Distributions",
+      "notebooks": [
+        "02-random-variables-and-distributions",
+        "03-expectation-variance-and-moments"
+      ]
+    },
+    {
+      "title": "Joint Distributions & The Gaussian",
+      "notebooks": [
+        "04-joint-marginal-and-conditional",
+        "05-the-gaussian-distribution"
+      ]
+    },
+    {
+      "title": "Inference, Information & Sampling",
+      "notebooks": [
+        "06-maximum-likelihood-and-bayesian-inference",
+        "07-information-theory",
+        "08-sampling-clt-and-hypothesis-testing"
+      ]
+    }
+  ]
+}

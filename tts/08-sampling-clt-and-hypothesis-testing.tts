@@ -1,0 +1,121 @@
+Welcome to notebook eight — sampling, the central limit theorem, and hypothesis testing. The most fundamental theorem in probability is the law of large numbers. Sample averages converge to expectations.
+
+Given i i d random variables x one, x two, and so on, with expectation mu, the sample mean x bar n — equal to one over n, times the sum of x sub i — converges to mu, as n goes to infinity.
+
+Two flavors of this result. The weak l l n gives convergence in probability. The probability that the sample mean differs from mu by more than any small epsilon, goes to zero. The strong l l n gives almost sure convergence. The sample mean converges to mu with probability one. For machine learning, the distinction rarely matters. The takeaway — estimate any expectation by averaging samples.
+
+The l l n is what makes empirical risk minimization legitimate. We minimize the training set average loss — one over n, times the sum of the per sample loss — as a proxy for the true expected loss. As n grows, the empirical average converges to the true expectation. Under regularity conditions, the minimizer of the empirical loss converges to the minimizer of the true loss. This is the only reason machine learning works at all.
+
+The l l n says nothing about the rate. How fast does the sample mean converge to mu? That is the next theorem.
+
+The central limit theorem — the universal gaussian. The l l n tells you that the sample mean converges to mu. The c l t tells you how fast, and how the deviations from mu are distributed.
+
+The statement. For i i d x one, x two, and so on, with mean mu and finite variance sigma squared, the standardized sample mean converges in distribution to a standard normal. Specifically, the square root of n, times the quantity x bar n minus mu, divided by sigma, converges in distribution to a standard normal.
+
+Equivalently, x bar n is approximately gaussian with mean mu and variance sigma squared divided by n, for large n. Sample means are gaussian with standard error sigma over the square root of n. This is the most used theorem in applied statistics.
+
+Three remarkable features of the c l t. Universality. The original distribution of the x sub i does not matter. As long as the variance is finite, the c l t holds. Sums of uniforms, exponentials, bernoullis — you name it — all become approximately gaussian. This is why the gaussian shows up so often in nature.
+
+Rate. Convergence is order one over the square root of n, in distributional distance. The berry esseen theorem makes this precise.
+
+Practical threshold. As a rule of thumb, the c l t is good enough for n greater than or equal to thirty, if the underlying distribution is not too pathological. For very skewed distributions with heavy tails, you may need much larger n.
+
+What the c l t does not say. It tells you about averages, not individual x sub i. Each x sub i retains whatever ugly distribution it had. The c l t only smooths things out when you average. A single sample from a cauchy distribution does not become gaussian. But an average of one thousand finite variance samples does.
+
+A machine learning angle. Stochastic gradient descent is the c l t in action. With batch size b, the mini batch gradient is an average of per sample gradients. By the c l t, the noise in the mini batch gradient is approximately gaussian, with variance sigma squared divided by b. Doubling the batch size halves the gradient noise variance. Standard error of every estimator in machine learning scales like one over the square root of n. Directly from the c l t.
+
+Now monte carlo integration. L l n plus c l t in one practical tool. To estimate the expectation of g of x, where x is drawn from p, draw samples x one through x n from p and average g. The estimator i hat sub n equals one over n, times the sum of g of x sub i.
+
+By the l l n, the estimator converges to the true expectation. By the c l t, the error is approximately gaussian with standard deviation sigma sub g, divided by the square root of n. Where sigma sub g squared is the variance of g of x. So the error rate is order one over square root of n.
+
+Why is monte carlo the default in high dimensions? Grid based numerical integration, like simpson's rule, has error rate order n to the negative k over d, for k-th order accuracy in d dimensions. Which explodes as d grows. Monte carlo's order one over square root of n is independent of dimension. In d equal to one hundred, monte carlo is the only feasible option.
+
+The practical limitation. The one over square root of n rate is slow. To reduce error by ten times, you need one hundred times more samples. For very precise estimates this becomes painful. Variance reduction techniques are how you fight back.
+
+Now importance sampling — variance reduction. Sometimes drawing from p is hard, or wasteful. Most samples contribute little. Importance sampling lets you draw from a different distribution q, and reweight.
+
+The expectation of g of x under p equals the expectation of g of x, times the importance weight p of x over q of x — under q. The ratio w of x equals p of x divided by q of x is called the importance weight.
+
+The estimator becomes one over n, times the sum of g of x sub i, times w of x sub i, where x sub i is drawn from q.
+
+Why bother? You cannot sample from p directly, but you can sample from q. Or, you want lower variance — choose q to put more mass where the product of g of x, times p of x, is large in absolute value. The optimal q star of x is proportional to the absolute value of g of x, times p of x. Cauchy schwarz tells you this. It would give zero variance, but it requires knowing the integral anyway. Practical q's aim for close to optimal.
+
+Or, you do off policy learning. Your data comes from one policy. Your target is a different one. Importance ratios convert between them.
+
+Watchouts. If q of x is zero where p of x is positive, the estimator is biased — you will miss mass that is in p. Heavy tailed weights cause high variance. A few rare samples dominate the estimate. Self normalized importance sampling — divide by the sum of weights — often helps. In high dimensions, p over q ratios can blow up exponentially. Importance sampling stops working past moderate dimensions. You need m c m c instead.
+
+A machine learning angle. Off policy reinforcement learning, p p o's clipped ratio objective, variational inference, r l h f — all involve importance ratios at the core.
+
+Now hypothesis testing — the null versus alternative framework. You want to decide whether model a is better than model b, or whether a feature has a real effect. Hypothesis testing is the formal frequentist framework.
+
+The setup. The null hypothesis h zero is the default or no effect claim. Usually — the means are equal, the coin is fair, the new model is no better than the old one. We assume h zero is true unless the data strongly contradict it. The alternative hypothesis h one is what you would conclude if h zero is rejected.
+
+The test statistic is a number computed from data that summarizes how surprising the data are under h zero. For example, a t statistic, a z score, the difference in sample means. The p value is the probability of the test statistic being at least as extreme as observed, conditional on h zero. The probability of seeing data this extreme if h zero were true. Not the probability that h zero is true.
+
+The significance level alpha is a pre set threshold, typically zero point zero five. Reject h zero if the p value is less than alpha.
+
+The two sample test is most common in machine learning. Group a has n sub a observations with sample mean x bar a. Group b has n sub b observations with sample mean x bar b. The test statistic t equals x bar a minus x bar b, divided by the square root of the pooled sample variance, times one over n a plus one over n b.
+
+Under h zero, and assuming approximate normality — which the c l t gives us when n is large — t follows a t distribution. Or approximately standard normal for very large samples. Read off the p value from the tails.
+
+Be careful with interpretation. A small p value means — if there were no effect, we would rarely see data this extreme. It does not tell you the probability that the effect exists.
+
+A non significant result, p greater than zero point zero five, does not mean no effect. Only — we lack evidence to reject h zero. Absence of evidence is not evidence of absence.
+
+P values are not effect sizes. A tiny but consistent difference can be statistically significant with enough data, yet practically meaningless.
+
+Multiple testing inflates false positives. If you run twenty tests at alpha equal to zero point zero five, you expect one false positive even when nothing is real. Use bonferroni, holm, or false discovery rate corrections like benjamini hochberg.
+
+Now type one and type two errors, and statistical power. Every hypothesis test has four possible outcomes.
+
+If h zero is true and you reject — that is a type one error, a false positive. If h one is true and you reject — that is a correct rejection. If h zero is true and you do not reject — that is a correct non rejection. If h one is true and you do not reject — that is a type two error, a false negative.
+
+The type one error rate equals alpha, the significance level. The probability of declaring an effect when there is none. Convention is zero point zero five. The type two error rate beta is the probability of missing a real effect. Convention is zero point one zero or zero point two zero.
+
+Statistical power equals one minus beta. The probability of correctly detecting a real effect, given that it exists. We want high power, typically zero point eight or higher.
+
+Power depends on four things. The sample size n — bigger is better. The effect size — bigger differences are easier to detect. The variance sigma squared — noisier data needs more samples. And the significance level alpha — being stricter, with smaller alpha, reduces power.
+
+The practical implication for a b testing. Before you run a test, decide what effect size you care about. Then compute the required sample size to detect it with eighty percent power, at alpha equal to zero point zero five. Running an underpowered test wastes time and yields ambiguous results.
+
+For two sample proportion tests, the required sample size per arm is roughly — two, times the square of z sub alpha over two, plus z sub beta, times p, times one minus p, divided by the squared effect size delta.
+
+For example, with p equal to ten percent, delta equal to zero point zero zero five — a five percent relative lift — alpha equal to zero point zero five, and beta equal to zero point two zero, the required n is about fifty six thousand five hundred per arm. Small effects require large samples. This is the achilles heel of a b testing for marginal improvements.
+
+The bayesian alternative. Bayesian a b testing computes the posterior probability that b is better than a, often using beta bernoulli conjugacy from notebook six. No p values. Direct probability statements. Increasingly common in modern data science orgs.
+
+Let us close with where this notebook appears in machine learning. It closes the probability repo and bridges into the empirical, applied side of m l.
+
+Mini batch stochastic gradient descent. The mini batch gradient is a sample mean. Its standard error scales like one over the square root of b, where b is the batch size. By the c l t. Doubling batch size halves variance.
+
+Monte carlo integration. E l b o estimation in variational auto encoders. Policy gradients — reinforce. Monte carlo dropout for uncertainty. Baseline subtraction for variance reduction.
+
+Importance sampling. Off policy reinforcement learning. D q n replay buffers use forms of this. Variational inference. R l h f policy reweighting.
+
+Markov chain monte carlo. Sampling from a posterior when conjugacy does not give you a closed form. Used in bayesian deep learning, probabilistic programming.
+
+Confidence intervals. Bootstrap your model's accuracy one thousand times. The distribution of accuracies gives you an interval estimate via quantiles.
+
+A b testing of machine learning models. Every recommendation, search, or ad ranking system in production uses online a b tests to decide if a new model is actually better.
+
+Statistical significance of evaluations. Do not claim model a beats model b without a paired test — for example, paired bootstrap on per sample metrics — and an effect size. Many improvements in papers are within noise.
+
+Multi armed bandits and thompson sampling. Bayesian or frequentist decisions about which arm to pull, formalized as sequential hypothesis testing.
+
+Power analysis for experiments. Before running an expensive online experiment, compute the required sample size for adequate power.
+
+Bootstrap. Resample with replacement to estimate the sampling distribution of an estimator without parametric assumptions.
+
+Cross validation as monte carlo. K fold c v is essentially monte carlo over data partitions. The variance of the c v score is the variance of an average.
+
+Calibration and expected calibration error. Reliability diagrams compare predicted probabilities versus empirical frequencies. Implicitly comparing distributions via test like procedures.
+
+Conformal prediction. Distribution free prediction intervals with finite sample frequentist coverage guarantees. Built on order statistics.
+
+Sequential testing in machine learning operations. Group sequential designs, e values, m s p r t. Modern alternatives to fixed n testing that let you peek at data without losing validity.
+
+That closes the probability and statistics repo. From p of omega equals one, in notebook one, to "we need fifty six thousand five hundred users per arm," in notebook eight.
+
+The three math foundation repos are complete. Linear algebra. Calculus. Probability and statistics.
+
+Next on the roadmap, the machine learning repo finally builds on all three pillars.

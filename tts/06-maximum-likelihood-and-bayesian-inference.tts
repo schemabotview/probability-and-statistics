@@ -1,0 +1,135 @@
+Welcome to notebook six — maximum likelihood and bayesian inference. You have data d, a set of x one through x n, and a model p of x given theta, with parameters theta. The likelihood is exactly the same equation as the joint p d f or p m f, but viewed differently.
+
+For independent and identically distributed data, the likelihood l of theta equals the joint p of d given theta. Which factors as the product of p of x sub i given theta.
+
+The crucial reinterpretation. P of x given theta, as a function of x with theta fixed, is a probability. It sums or integrates to one over x. But l of theta, as a function of theta with x fixed, is a likelihood. It does not sum to one over theta. It is not a probability distribution at all. It is just — how plausible would the data have been, if this theta were true?
+
+The likelihood is the bridge between data and parameter inference. Everything in this notebook — m l e, m a p, and bayesian inference — manipulates it.
+
+The log likelihood. Products of small numbers underflow fast. We always work with the log. Little l of theta equals log of capital l of theta. Which equals the sum, over i, of log of p of x sub i given theta.
+
+Sums are friendly to gradients and to floating point. The negative log likelihood, n l l, is what you minimize in nearly every neural network training run. Cross entropy is n l l for categorical outputs. M s e is n l l for gaussian outputs.
+
+Now maximum likelihood estimation. M l e picks the theta under which the observed data are most plausible. Theta hat m l e equals the argmax over theta of the likelihood. Equivalently, argmax of the log likelihood. Equivalently, argmin of the negative log likelihood. The minimum of negative log form is what training loops actually compute.
+
+The recipe is — first, write the likelihood as a product over data points. Second, take logs to turn it into a sum. Third, differentiate with respect to theta, set to zero. Fourth, solve for theta analytically, or use gradient descent.
+
+A worked example. Bernoulli. N i i d coin flips x one through x n, taking values zero or one. Model bernoulli of p. The likelihood is the product of p to the x sub i, times one minus p, to the one minus x sub i. Which simplifies to p to the k, times one minus p, to the n minus k. Where k is the total number of successes.
+
+The log likelihood is k times log p, plus n minus k, times log one minus p.
+
+Differentiate, set to zero. K over p, minus n minus k over one minus p, equals zero. Solving, p hat m l e equals k over n. The m l e of a coin's bias is exactly the sample proportion of heads. The intuitive answer, derived rigorously.
+
+A second worked example. Gaussian. Data from gaussian with mean mu and variance sigma squared. We already saw the results in notebook five. Mu hat equals x bar. And sigma hat squared equals one over n, times the sum of x sub i minus x bar, squared. The derivation is two single variable optimizations.
+
+A third worked example. Linear regression. Data x sub i and y sub i. Model — y sub i equals w transpose, times x sub i, plus epsilon sub i. Where epsilon sub i is gaussian noise with mean zero and variance sigma squared.
+
+The log likelihood is negative n over two, times log two pi sigma squared, minus one over two sigma squared, times the sum of y sub i minus w transpose x sub i, squared.
+
+Maximize over w. The first term does not depend on w. So w hat m l e equals the argmin of the sum of squared residuals. That is least squares regression.
+
+The famous identity — m s e training is m l e under gaussian noise. Reach for an L one loss instead, and you are doing m l e under laplace noise. Reach for cross entropy, and you are doing m l e under categorical or bernoulli. Every loss is a likelihood in disguise.
+
+A few properties of m l e are worth knowing. They explain why m l e is the workhorse of frequentist statistics.
+
+M l e is consistent. Theta hat converges to the true theta as n goes to infinity.
+
+M l e is asymptotically normal. The square root of n, times theta hat minus the true theta, converges to a gaussian with mean zero and covariance the inverse fisher information at the true theta. This is the cramer rao bound. No unbiased estimator can do better asymptotically. M l e is asymptotically efficient.
+
+M l e is invariant. If theta hat is the m l e of theta, then g of theta hat is the m l e of g of theta, for any function g.
+
+Failure modes worth knowing. M l e overfits with small data. M l e picks the parameters that exactly fit what you saw. With few examples, this is often a bad estimate. Bayesian methods or regularization mitigate this.
+
+M l e can be unbounded. For gaussian mixtures, the m l e can place a gaussian on a single data point with zero variance and infinite likelihood. Pathological but real. Variational auto encoder training has variations of this issue.
+
+M l e has plateaus and saddles. Non convex log likelihoods — neural nets, mixtures — have many local optima and saddle points. M l e finds one of them, not necessarily the best.
+
+M l e in practice for machine learning. Almost every neural network's training objective is negative log likelihood, minimized by stochastic gradient descent. So you have been doing m l e all along, every time you trained a model.
+
+Now bayesian inference — treating parameters as random. The frequentist view is that theta is a fixed but unknown number. We estimate it with theta hat. The bayesian view is that theta is itself a random variable, with a distribution that we update as we see data.
+
+Three ingredients. The prior p of theta — your belief about theta before seeing the data. The likelihood p of d given theta — same as before. And the posterior p of theta given d — your belief about theta after seeing the data.
+
+The bridge between them is bayes theorem from notebook one. P of theta given d equals p of d given theta, times p of theta, all divided by p of d.
+
+The denominator p of d equals the integral of p of d given theta, times p of theta, d theta. It is called the evidence, or the marginal likelihood. It is a constant in theta. So we usually write proportionality. P of theta given d is proportional to p of d given theta, times p of theta.
+
+Posterior equals likelihood times prior, normalized. The shape of the posterior reflects what the data and the prior agree on.
+
+What you get from the posterior. Point estimates — posterior mean, posterior median, posterior mode, also known as m a p. Credible intervals — a ninety five percent credible interval means the probability that theta lies in the interval, given the data, equals zero point nine five. The bayesian analogue of a confidence interval. And arguably what people think a confidence interval means. And the predictive distribution — p of x new given d equals the integral of p of x new given theta, times p of theta given d, d theta. The full uncertainty aware prediction, averaging over parameter uncertainty.
+
+When does frequentist versus bayesian matter? Lots of data, well specified model — frequentist and bayesian agree closely. Little data, or strong prior knowledge available — bayesian wins by leveraging the prior. Need uncertainty quantification — bayesian gives it for free. Want a single number, fast — m l e or m a p gives it cheaply.
+
+Now m a p — the bridge between m l e and bayesian inference. The maximum a posteriori estimate is the mode of the posterior. Theta hat m a p equals argmax over theta of the posterior. Equivalently, argmax of the log likelihood, plus the log prior.
+
+Compare to m l e — argmax of just the log likelihood.
+
+So m a p equals m l e plus a regularizer. The prior contributes an extra term to the objective. Whatever family of prior you pick determines what kind of regularization you get.
+
+A gaussian prior on theta, mean zero and variance sigma squared times the identity, gives a log prior equal to negative one over two sigma squared, times the squared norm of theta — plus a constant. That is L two regularization, also known as ridge. The strength is one over sigma squared.
+
+A laplace prior on theta gives a log prior proportional to the negative L one norm of theta. That is L one regularization, also known as lasso.
+
+A uniform prior gives no regularization. M a p equals m l e.
+
+So every regularized loss function in machine learning is m a p estimation under some prior. Weight decay in pytorch is literally sigma squared equal to one over lambda. Dropout has a bayesian interpretation. Early stopping is implicit regularization. The connections run deep.
+
+M a p versus full bayesian. M a p gives a single point. Fast, deterministic, easy to train. Full bayesian gives the whole posterior. More uncertainty info, but expensive and usually intractable. Requires markov chain monte carlo or variational methods. Machine learning overwhelmingly uses m a p for training, and reserves full bayesian methods for cases where uncertainty matters most — small data, safety critical systems, model selection.
+
+Now conjugate priors. When the prior and likelihood are chosen so that the posterior stays in the same family as the prior, the prior is called conjugate to the likelihood. The posterior update becomes algebraic. No integrals, no sampling.
+
+The conjugate pair beta bernoulli. For a bernoulli likelihood with parameter p, the beta distribution is conjugate. If p is drawn from beta with parameters alpha and beta, and x sub i given p is bernoulli with parameter p, and you observe k successes in n trials, then the posterior p given d is beta with parameters alpha plus k, and beta plus n minus k. The posterior is also a beta — with parameters bumped by the counts of successes and failures. Beautiful, and trivially updateable as new data arrives.
+
+The interpretation of beta parameters as pseudo counts. Alpha counts "successes seen before any data." Beta counts "failures seen before any data." A beta one and one prior is uniform — no pseudo counts, full reliance on the data. A beta ten and ten is much stronger. Equivalent to seeing ten successes and ten failures up front.
+
+The conjugate pair gaussian gaussian, with known variance. For a gaussian likelihood, with known variance, and a gaussian prior on the mean, the posterior is also gaussian, with a precision weighted mean. We will not write the formula here. The structure is the same as beta bernoulli. The parameters update algebraically.
+
+Why does conjugacy matter? When you can use conjugate priors, bayesian inference is cheaper than m l e because the posterior is closed form. When you cannot — most real machine learning problems — you fall back to markov chain monte carlo, variational inference, or just give up and use m a p. The exponential family and conjugate prior story is the bedrock of probabilistic graphical models.
+
+Machine learning applications. Latent dirichlet allocation topic models. Bayesian linear regression. Gaussian processes — gaussian gaussian conjugacy in disguise. Thompson sampling for multi armed bandits. And a lot of statistical inference packages all rely on conjugate updates.
+
+Finally, the m l e to loss function bridge. Every common loss in machine learning corresponds to m l e under a specific noise model.
+
+M s e for regression corresponds to gaussian likelihood — additive gaussian noise on y. L one for regression corresponds to laplace likelihood — additive laplace, or double exponential, noise. Huber loss corresponds to a gaussian laplace mix — a tail robust noise model. Binary cross entropy corresponds to bernoulli likelihood — binary outcome y modeled by p hat. Categorical cross entropy corresponds to categorical likelihood — k class outcome modeled by p hat. Poisson negative log likelihood corresponds to poisson likelihood — count outcomes modeled with rate lambda hat.
+
+Reading this table backwards is the key insight. The choice of loss is implicitly the choice of a probabilistic model of the noise or output. If you change the loss, you have changed the model.
+
+Some practical consequences. Outliers. M s e corresponds to gaussian noise, which has light tails. Outliers get heavily penalized by squared error. L one or huber correspond to heavier tailed noise — more robust to outliers, but slower to converge.
+
+Multi class classification. Cross entropy is m l e for a categorical output. There is no good non probabilistic alternative.
+
+Regression with bounded outputs. A beta distributed likelihood with a sigmoid output models bounded y in the interval zero to one, better than m s e.
+
+Uncertainty. Probabilistic losses can be replaced by their full negative log likelihoods — predicting both mean and variance — which gives you calibrated uncertainty for free.
+
+Regularization. Once you see the loss as n l l, adding L two regularization, also known as weight decay, is m a p under a gaussian prior on weights. L one regularization, lasso, is m a p under a laplace prior. These are not arbitrary tricks. They are proper bayesian moves.
+
+Let us close with where m l e and bayesian inference appear in machine learning. They are the conceptual machinery behind almost every training procedure.
+
+Neural network training. Negative log likelihood objective, optimized by stochastic gradient descent, equals m l e. Add weight decay and that is m a p under a gaussian prior.
+
+Logistic regression and softmax classification. M l e under bernoulli or categorical with linear logits.
+
+Linear regression closed form. W hat equals x transpose x, inverse, times x transpose y. That is the m l e under gaussian noise. The ridge variant adds lambda times identity inside the inverse. That is m a p under a gaussian prior on w.
+
+Naive bayes. Directly bayesian — uses bayes theorem at prediction time with class conditional likelihoods.
+
+Gaussian discriminant analysis — l d a and q d a. Generative m l e. Fit gaussians to each class.
+
+The e m algorithm. Iteratively maximizes a lower bound on the log likelihood for latent variable models — gaussian mixture models, hidden markov models, latent dirichlet allocation.
+
+Variational inference. Approximate the true posterior with a tractable distribution q of theta, fit by minimizing k l divergence. Used in variational auto encoders, bayesian neural networks, topic models.
+
+Markov chain monte carlo. When you cannot do conjugate updates, sample from the posterior using metropolis hastings, gibbs, hamiltonian monte carlo, or nuts.
+
+Bayesian neural networks. Treat weights as random variables. Learn approximate posteriors. Gives uncertainty estimates that point estimate networks cannot.
+
+Thompson sampling. Bayesian bandits — sample from the posterior over reward distributions to balance exploration and exploitation.
+
+Bayesian optimization. Place gaussian process priors over objective functions to optimize expensive black box functions with few evaluations. Used for hyperparameter tuning.
+
+Probabilistic programming. P y m c, num pyro, stan, pyro, edward — frameworks for specifying probabilistic models and doing posterior inference automatically.
+
+Conformal prediction. Distribution free uncertainty bounds. Frequentist in spirit, but bayesian adjacent in practice.
+
+The next notebook covers information theory. The conceptual home of cross entropy, k l divergence, and the math underneath classification losses, variational inference, and self supervised objectives.

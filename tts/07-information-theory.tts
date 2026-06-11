@@ -1,0 +1,133 @@
+Welcome to notebook seven — information theory. The entropy of a discrete random variable x with p m f p is — h of x equals the negative sum, over x, of p of x, times log p of x. Equivalently, the expectation of negative log p of capital x.
+
+For continuous x, the differential entropy uses an integral instead of a sum. Some properties differ, but the machine learning applications focus on the discrete case for classification.
+
+The base of the logarithm chooses the units. Log base two gives bits. Natural log gives nats — used in machine learning almost universally. Log base ten gives dits, or hartleys — rare. We will use natural log throughout, matching most m l code.
+
+Three ways to read entropy. First, as surprise. Negative log p of x is the surprise of seeing outcome x. Rare events with small p have high surprise. Certain events with p equal to one carry zero surprise. Entropy is the expected surprise.
+
+Second, as uncertainty. Entropy is maximum when all outcomes are equally likely — the uniform distribution. And zero when one outcome is certain. High entropy means high uncertainty. Low entropy means predictable.
+
+Third, as a compression bound. Shannon's coding theorem says — the optimal lossless code for outcomes from distribution p uses on average h of x bits per symbol. You cannot compress below entropy. You should aim to get close to it.
+
+A few examples. A fair coin has entropy equal to negative one half log one half, minus one half log one half. Equal to log two, which is one bit. Maximum uncertainty for a binary variable. A biased coin with p equal to zero point nine has entropy about zero point four seven bits. Much less uncertainty. We mostly expect heads. A deterministic distribution has entropy zero. No uncertainty.
+
+A few properties. Entropy is non negative. Entropy is at most log k for k outcomes. Equality if and only if uniform. Uniform distributions are maximum entropy. And joint entropy h of x and y is at most h of x plus h of y, with equality if and only if x and y are independent. This is called subadditivity.
+
+Now cross entropy. Suppose data comes from p, but you describe it — compress it, predict it — with a different distribution q. The cross entropy is the expected surprise of q evaluated on p's samples. H of p and q equals the negative sum, over x, of p of x, times log q of x. Equivalently, the expectation, under x drawn from p, of negative log q of capital x.
+
+When q equals p, cross entropy equals entropy. H of p and p equals h of p. Otherwise, h of p and q is strictly greater than h of p. Using the wrong distribution to describe data costs extra surprise.
+
+The classification connection. In supervised learning, p is the empirical distribution of labels — often a one hot vector for a single example, putting all probability on the true class y. And q is the model's prediction p hat. The cross entropy loss for one example is — negative sum, over k, of y sub k, times log p hat sub k.
+
+For a one hot target with y at the true class equal to one, this collapses to negative log p hat at the true class. The single number — negative log of the predicted probability of the correct class. This is the loss every classification network minimizes.
+
+It is also exactly the negative log likelihood under a categorical model. Cross entropy and n l l are the same thing. Different names, same object.
+
+The binary case. For bernoulli with predicted probability p hat and label y, the binary cross entropy is — negative y, times log p hat, minus one minus y, times log of one minus p hat. This is what n n dot b c e loss computes.
+
+Now k l divergence — the "distance" from q to p. The most used quantity in probabilistic m l. Defined as — d k l of p, given q, equals the sum, over x, of p of x, times log of p of x divided by q of x. Equivalently, the expectation, under x drawn from p, of log p of x divided by q of x.
+
+The equivalent rewrite to memorize — d k l of p given q equals h of p and q, the cross entropy, minus h of p, the entropy.
+
+K l divergence is the extra surprise from using q instead of p. Cross entropy minus entropy. Always non negative. Zero if and only if p equals q.
+
+A few important properties — and one famous non property. D k l of p given q is greater than or equal to zero. This is called gibbs inequality. Proved using jensen's inequality on the concave log function. D k l equals zero if and only if p equals q almost everywhere.
+
+Not symmetric. D k l of p given q is generally not equal to d k l of q given p. This is why k l is called a divergence, not a distance. It does not satisfy the distance axioms. The asymmetry matters. D k l of p given q penalizes q for having low mass where p has high mass — called mode covering. D k l of q given p does the opposite — called mode seeking.
+
+K l does not satisfy the triangle inequality.
+
+The classification loss connection. For one hot labels, where h of p equals zero, the cross entropy equals d k l of p given q, plus h of p — which is just d k l. So minimizing cross entropy equals minimizing k l equals pulling the predicted distribution toward the true distribution. Three different framings of the same objective.
+
+The variational connection. Variational inference, variational auto encoders, k l regularized reinforcement learning, r l h f, distillation — all use k l as the unit of distance between probability distributions.
+
+A subtle point. D k l of p given q is undefined, or infinite, wherever q of x is zero but p of x is positive. This is why classification losses often clamp predicted probabilities to a small range above zero and below one — to avoid negative log of zero, which is infinity.
+
+Now mutual information. How much does knowing y tell you about x? The answer is the mutual information. I of x and y equals d k l of the joint p of x and y, given the product of marginals p of x, times p of y.
+
+It is the k l divergence between the joint and the product of marginals. If x and y are independent, the joint equals the product of marginals, and the mutual information is zero. Otherwise it is positive — measuring how far from independent the two variables are.
+
+Equivalent expressions worth memorizing. I of x and y equals h of x, minus the conditional entropy h of x given y. Equivalently, h of y, minus h of y given x. Equivalently, h of x plus h of y, minus h of x and y.
+
+Reading them — mutual information is the reduction in uncertainty about x once you observe y, or vice versa. It is also symmetric. I of x and y equals i of y and x, unlike k l.
+
+Bounds. I of x and y is between zero and the minimum of h of x and h of y. I of x and y equals zero if and only if x and y are independent. I of x and x equals h of x — knowing x perfectly tells you all of h of x.
+
+A machine learning angle. Mutual information shows up in feature selection. Pick features with high mutual information with y. They are informative about the label.
+
+Information bottleneck. Trade off i of z and y, which should be high — predictive — against i of z and x, which should be low — compressed. A theoretical lens on representation learning.
+
+Info n c e and contrastive learning. Sim c l r, mo co, clip — all train representations to maximize a lower bound on mutual information between augmentations or between modalities.
+
+Variational auto encoders. Beta v a e's add a penalty proportional to i of z and x to learn disentangled representations.
+
+Self supervised pre training. Predict masked or future content. High mutual information between visible and hidden parts is what makes the task informative.
+
+Now jensen's inequality — the workhorse. A convex function f lies below every chord. Equivalently, for a random variable x — f of the expectation of x is less than or equal to the expectation of f of x.
+
+For concave f, the inequality flips. F of the expectation of x is greater than or equal to the expectation of f of x.
+
+This is jensen's inequality, and it is the source of probably half the proofs in probability and information theory.
+
+Why does it matter here? First, k l divergence is non negative. Apply jensen to the concave function negative log. Negative d k l of p given q equals the expectation, under p, of log of q of x divided by p of x. By jensen, less than or equal to log of the expectation of q of x divided by p of x. Which equals log of one. Which is zero. So k l is greater than or equal to zero. Three lines, profound consequences.
+
+Second, the evidence lower bound, e l b o. Variational inference uses jensen to bound log p of x from below by a tractable expression, then maximizes that bound. The entire v a e training objective is a jensen derived inequality.
+
+Third, concavity of entropy. H of p is a concave function of p. Hence bayesian model averaging — a mixture — has entropy higher than the mixture weighted average of the components entropies.
+
+Fourth, convexity of negative log likelihood for exponential family. Makes m l e for exponential family distributions a convex optimization problem. Solved efficiently. No bad local minima.
+
+Jensen is one of those identities you will apply over and over without explicitly invoking it. Once you spot the move — concave function, expectation moves in — the proofs that seemed magical become natural.
+
+Now the information theory bridge to machine learning losses. Bring it all together. The information theoretic interpretation of the standard losses.
+
+Cross entropy classification loss. Minimizing the cross entropy of empirical p and model q over theta is equivalent to minimizing the k l divergence — since the entropy of the empirical distribution is constant. You are pulling the model's predicted distribution as close as possible to the empirical one.
+
+K l regularized reinforcement learning — t r p o, p p o. Add beta times the k l divergence of the new policy from the old policy, to the policy gradient objective, so updates cannot move the policy too far per step. K l acts as a trust region constraint.
+
+R l h f. Reward equals the reward model score, minus beta times the k l divergence of the policy from the supervised fine tuned reference. The k l penalty keeps the r l h f tuned model from drifting too far from the s f t baseline.
+
+Distillation. Train student q to match teacher p by minimizing the k l divergence of teacher from student. The teacher's soft probabilities carry more information than hard labels — sometimes called dark knowledge.
+
+Variational inference, e l b o, v a e's. Maximize the expectation under q of log p of x given z, minus the k l divergence of q of z given x, from the prior p of z. The first term is reconstruction. The second term is a k l regularizer that keeps the posterior close to the prior.
+
+Info n c e for contrastive learning. A lower bound on the mutual information between paired positives. Maximizing it pushes positives together and negatives apart in representation space.
+
+Information bottleneck. Train representations to maximize i of z and y, while minimizing i of z and x. Extract only the information relevant to predicting y. A theoretical lens, sometimes operationalized in practice.
+
+These all share the same vocabulary. Entropies, cross entropies, k l divergences. Once you see them, you can read modern machine learning papers fluently.
+
+Let us close with where information theory appears in machine learning. It is the second most used branch of math in modern m l, after linear algebra. Every probabilistic objective lives here.
+
+Cross entropy classification. Standard loss for every classification model. Multi class softmax plus cross entropy is the negative log likelihood, equal to the k l divergence between empirical and model distributions.
+
+Binary cross entropy, log loss. Same story, two class version. Used in logistic regression, generative adversarial networks for the discriminator, and binary classification.
+
+Label smoothing. Replace one hot — zero zero one zero — with a slightly softened version. Adds entropy to the target. Softens the cross entropy gradient. Less overconfidence. Pure information theory move.
+
+V a e training. Maximize the e l b o. Reconstruction — cross entropy or gaussian n l l — minus the k l divergence of the encoder posterior from the prior.
+
+Diffusion model training. Each denoising step has an e l b o like k l objective. Closed form for gaussian conditionals.
+
+P p o and t r p o. K l divergence trust regions on policy updates.
+
+R l h f. K l penalty against the s f t reference model.
+
+Distillation. Student matches teacher's softmax distribution via k l, sometimes with temperature scaling.
+
+Contrastive learning. Sim c l r, mo co, clip. Maximize info n c e — a mutual information lower bound between views or modalities.
+
+Information bottleneck networks. Explicitly regularize i of z and x to learn minimal sufficient representations.
+
+Mutual information for feature selection. Pick features x sub i with highest mutual information with the label y.
+
+Information gain in decision trees. Splits chosen to maximize the entropy of y, minus the conditional entropy of y given the split. Exactly mutual information at the split.
+
+Maximum entropy modeling. Choose p to maximize entropy subject to moment constraints. Equivalent to fitting an exponential family distribution.
+
+Bits per character or bits per token in language models. A direct reading of cross entropy in compression units. State of the art reporting in language modeling uses bits per character.
+
+Calibration. Compare predicted distribution to empirical via reliability diagrams and expected calibration error. Entropy aware variants include the brier score decomposition.
+
+The next notebook covers sampling, the central limit theorem, and hypothesis testing. The law of large numbers, the c l t, monte carlo, and a b testing. Closing the probability repo and bridging to applied statistics.

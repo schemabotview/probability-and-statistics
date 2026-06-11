@@ -1,0 +1,119 @@
+Welcome to the probability and statistics notebook. Linear algebra and calculus gave us the algorithms. Probability is the language we use to talk about uncertainty. And machine learning is fundamentally a discipline of reasoning under uncertainty. Every prediction comes with a confidence. Every model has noise. Every dataset is a sample from a larger world we never fully see.
+
+Probability does four jobs in machine learning. And the eight notebooks of this repo each serve at least one of them.
+
+The first job is to model the data generating process. Every dataset is treated as samples from some unknown distribution p of x comma y. Whether you train a regression or a transformer, you are implicitly or explicitly fitting a probabilistic model. Naive bayes, logistic regression, gaussian mixture models, variational auto encoders, diffusion models — all directly probabilistic. Even non probabilistic models like support vector machines have probabilistic interpretations.
+
+The second job is to quantify uncertainty in predictions. A classifier does not just say cat — it says ninety two percent cat, five percent dog, three percent other. Those probabilities matter for calibration, for active learning, for safety critical applications, and for any decision making downstream of the model.
+
+The third job is to justify the loss functions you train with. Mean squared error equals maximum likelihood estimation under gaussian noise. Cross entropy equals the negative log likelihood for categorical outcomes. The L one loss equals m l e under laplace noise. Every common loss has a probabilistic story underneath. Once you see it, you understand why the loss is what it is, and when it is the wrong choice.
+
+The fourth job is to reason about generalization and statistical tests. How confident are we that model a beats model b? How big a test set do we need? The central limit theorem, confidence intervals, and hypothesis testing are how you answer these. A b testing — which every product team runs — is applied statistics.
+
+Memorize those four jobs. They are the entire reason probability shows up in machine learning.
+
+Now let us preview the roadmap. Eight notebooks build from first axioms up to the statistical tools you will use on the job.
+
+This notebook covers probability axioms, conditional probability, and bayes theorem. Then random variables and distributions — how we package uncertainty into mathematical objects, and the staple distributions like bernoulli, categorical, poisson, and gaussian. Then expectation, variance, and moments — the summary statistics of distributions and the identities you will use constantly. Then joint, marginal, and conditional distributions — multiple random variables at once, and the chain rule of probability. Then the gaussian distribution — the most used distribution in machine learning, in both its scalar and multivariate forms. Then maximum likelihood and bayesian inference — how to learn from data, in both frequentist and bayesian styles. Then information theory — entropy, cross entropy, and k l divergence, the math of classification losses and variational inference. And finally sampling, the central limit theorem, and hypothesis testing — the law of large numbers, the central limit theorem, monte carlo, and a b testing.
+
+By the end you will be fluent in the language of probabilistic modeling, comfortable computing likelihoods and posteriors, and able to design and analyze a b tests.
+
+Now let us get to sample spaces and events. Before we talk about probabilities, we need objects to assign probabilities to.
+
+A sample space, written capital omega, is the set of all possible outcomes of an experiment. For a coin flip, omega is the set heads, tails. For a die roll, omega is the set one through six. For tomorrow's temperature in mumbai, omega is the real line, or some interval thereof. The choice of omega is part of modeling. You pick the sample space that matters for the question you are asking.
+
+An event is a subset of omega. The event "the die comes up even" is the subset two, four, six. The event "the temperature is between twenty eight and thirty two degrees" is the interval from twenty eight to thirty two. Events are the things we want probabilities of.
+
+Two important special events. Omega itself, which is the certain event — something must happen. And the empty set, which is the impossible event — none of the outcomes occur.
+
+Operations on events. Events combine with set operations, which mirror logical operations. A union b means "a or b, or both." A intersect b means "a and b." A complement, or a bar, means "not a." And a subset of b means "a implies b."
+
+For example, rolling a die, let a equal one, two, three — "low." Let b equal two, four, six — "even." Then a intersect b equals just two — "low and even." And a union b equals one, two, three, four, six — "low or even."
+
+Now the kolmogorov axioms. A probability is a function capital p that takes an event and returns a number between zero and one. The number is the weight of that event — how often it happens, or how much we believe in it.
+
+Andrey kolmogorov realized in nineteen thirty three that all of probability theory follows from just three rules.
+
+Axiom one. Non negativity. P of a is greater than or equal to zero, for every event a. Probabilities cannot be negative.
+
+Axiom two. Normalization. P of omega equals one. Something happens with probability one.
+
+Axiom three. Countable additivity. For any disjoint, meaning non overlapping, events a one, a two, and so on — the probability of their union equals the sum of their individual probabilities.
+
+That is it. Everything we derive — bayes theorem, the law of large numbers, the central limit theorem — follows from these three axioms.
+
+A few immediate consequences. The probability of the impossible event is zero. The probability of a complement equals one minus the probability of a — probabilities of complements sum to one. The probability of a union b equals p of a, plus p of b, minus p of a intersect b — that is the inclusion exclusion formula, for overlapping events. For disjoint events it reduces to axiom three. And every probability is between zero and one.
+
+We rarely cite the axioms in machine learning practice. But every probabilistic argument you will see rests on them.
+
+Now conditional probability. The probability of a given that we already know b occurred, written p of a given b, is defined as the probability of a intersect b, divided by the probability of b — provided p of b is positive.
+
+Geometrically, we are restricting our universe to outcomes where b happened, and asking what fraction of those also have a. The denominator p of b renormalizes — within this restricted universe, b happens with probability one.
+
+Example. Roll a die. P of one equals one sixth. But p of one given odd equals one sixth divided by one half, which equals one third. Once we know the result is odd, the only possible outcomes are one, three, five. And one is one of three.
+
+The product rule. Rearranging the definition. P of a intersect b equals p of a given b, times p of b. Equivalently, p of b given a, times p of a. This pair of equalities is the workhorse of all probabilistic reasoning. It is also the seed of bayes theorem.
+
+A machine learning angle. Almost every prediction you make is a conditional probability. P of y equals cat, given x equals image. Classifiers output conditional distributions. Language models output p of the next token, given the previous tokens. The whole apparatus of supervised learning is estimating conditional distributions.
+
+Now bayes theorem — probability's single most important identity, and the engine of every bayesian model.
+
+From the product rule, we have two expressions for p of a intersect b. P of a given b, times p of b, equals p of b given a, times p of a. Divide both sides by p of b — when it is nonzero — and you get bayes theorem.
+
+P of a given b equals p of b given a, times p of a, all divided by p of b.
+
+In words — the posterior is proportional to the likelihood times the prior, normalized. Each piece has a name and a role.
+
+P of a given b is called the posterior. What we believe about a after seeing b.
+
+P of b given a is called the likelihood. How plausibly we would see b if a were true.
+
+P of a is called the prior. What we believed about a before seeing b.
+
+And p of b is called the evidence. The total probability of seeing b. A normalizing constant.
+
+The evidence can be expanded using the law of total probability. For a partition of the sample space, p of b equals the sum, over i, of p of b given a sub i, times p of a sub i. This is the sum over all explanations, weighted by their priors. We will lean on it for the canonical bayes theorem example.
+
+A classic example — disease testing. A disease has prevalence one percent in the population. A test is ninety nine percent sensitive — catches the disease when present. And ninety nine percent specific — does not fire when absent. You test positive. What is the probability you actually have the disease?
+
+Let capital d mean "have disease." Let plus mean "test positive." The prior is p of d equals zero point zero one. The complement, p of d complement, is zero point nine nine.
+
+The likelihoods. P of plus given d is zero point nine nine. P of plus given d complement is zero point zero one.
+
+The evidence. P of plus equals zero point nine nine, times zero point zero one, plus zero point zero one, times zero point nine nine. Which equals zero point zero one nine eight.
+
+The posterior. P of d given plus equals the likelihood times the prior, divided by the evidence. That is zero point nine nine, times zero point zero one, divided by zero point zero one nine eight. Which equals approximately zero point five.
+
+Even with a ninety nine percent accurate test, a positive result only means you have a fifty percent chance of being sick. Because the disease is rare. This is called the base rate fallacy, and it is the most cited bayes example for a reason. Human intuition badly underestimates the role of the prior.
+
+Now independence. Two events a and b are independent if knowing one tells you nothing about the other. P of a given b equals p of a. Equivalently, p of b given a equals p of b.
+
+Substituting back into the product rule gives the cleanest form of the definition. P of a intersect b equals p of a, times p of b. If and only if a and b are independent.
+
+Two pitfalls people fall into. Independence is not the same as disjointness. Disjoint events a and b cannot be independent, unless one has probability zero. If b happens, then a cannot, so knowing b changes everything about a. Disjoint is the opposite of independent in some sense.
+
+And pairwise independence is not the same as mutual independence. Three events can be pairwise independent without being jointly independent. The full definition of mutual independence requires p of a intersect b intersect c, equal to the product p of a, times p of b, times p of c. And it requires all pairwise conditions also hold.
+
+Conditional independence. Events a and b are conditionally independent given c, if p of a intersect b given c, equals p of a given c, times p of b given c. This shows up everywhere in graphical models — d separation, bayes nets, naive bayes. It is a much more useful property than plain independence, because pure independence is rare in real data, but conditional independence given the right covariates often holds.
+
+A machine learning angle. Naive bayes is the assumption that all features are conditionally independent given the class. It is almost never true, but the assumption makes the math trivial, and the model often works anyway. Which is the punchline of half of practical machine learning.
+
+Let us close with where this appears in machine learning. Even before we talk about random variables, the axioms and bayes theorem are the language of probabilistic reasoning across the field.
+
+Bayes theorem in classifiers. The bayes optimal classifier outputs the argmax over y, of p of y given x. Which by bayes equals the argmax over y, of p of x given y, times p of y. Every classifier is approximating this. Naive bayes literally. Neural classifiers implicitly.
+
+Naive bayes. Apply bayes theorem with the conditional independence given class assumption. P of x one through x d, given y, equals the product, over i, of p of x sub i, given y. Cheap, fast, surprisingly competitive for text classification.
+
+Posterior inference in bayesian models. Every bayesian neural network, gaussian process, latent dirichlet allocation, and so on, computes — or approximates — p of theta given d, proportional to p of d given theta, times p of theta. Bayes rule, one more time.
+
+Bayesian model selection. Compare models by their evidence — p of d given m — using bayes rule at the model level.
+
+The base rate fallacy in machine learning diagnostics. Highly accurate medical or fraud detection classifiers can still be useless on rare classes. Without addressing the base rate, ninety nine percent accuracy can mean always predicting the majority class. Precision and recall trade offs are a quantitative response to this.
+
+Conditional independence in graphical models. Bayesian networks, markov random fields, hidden markov models — all built on conditional independence assumptions encoded in graph structure.
+
+Causality. The whole "causation versus correlation" discussion is about whether independencies are preserved under interventions. The probability axioms are the foundation. Judea pearl's do calculus is the upgrade.
+
+A b testing. When you compute the probability of seeing this result if a and b are actually equal, you are applying conditional probability under a null hypothesis.
+
+The next notebook covers random variables and distributions. We generalize event probability to a whole function over outcomes, and meet the staple distributions you will encounter in every probabilistic model.

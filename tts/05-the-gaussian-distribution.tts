@@ -1,0 +1,119 @@
+Welcome to notebook five — the gaussian distribution. X drawn from a gaussian with mean mu and variance sigma squared has p d f equal to one over sigma, times the square root of two pi, all multiplied by the exponential of negative x minus mu, squared, divided by two sigma squared.
+
+Two parameters, both interpretable. Mu is the mean — also the median and the mode. The gaussian is symmetric. Sigma squared is the variance. Sigma is the standard deviation.
+
+The standard normal is the special case mu equals zero, sigma equals one. Every other gaussian is a linear transformation of it. If z is standard normal, then x equals mu plus sigma times z is gaussian with mean mu and variance sigma squared. We will use this fact constantly.
+
+The sixty eight, ninety five, ninety nine point seven rule is worth memorizing for interview answers. About sixty eight percent of mass is within one standard deviation of the mean. About ninety five percent within two. And about ninety nine point seven percent within three.
+
+Why this shape? The exponential of a negative quadratic. The quadratic makes the p d f maximum at mu, and quickly drives the density to zero on either side — exponentially fast in distance squared. This is what gives the gaussian its light tails — low kurtosis, no fat outliers.
+
+The one over sigma, times square root of two pi, normalizer, is what makes the p d f integrate to one. The integral of e to the negative x squared over two, d x, equals the square root of two pi. One of the most quoted "non elementary but famous" integrals. There is no closed form antiderivative, but the definite integral has this beautiful value. Provable with the polar coordinates trick.
+
+Now why the gaussian is everywhere — a preview of the central limit theorem. The deep reason the gaussian shows up so often. Notebook eight covers it formally. But the punchline now — the average of many independent random variables, whatever their original distribution, is approximately gaussian.
+
+This means any quantity that is a sum or average of many small independent effects tends to be gaussian. Measurement noise. Polling errors. Neural activations across many inputs. Financial returns. Many things in nature look gaussian, not because the underlying mechanism is gaussian, but because averaging hides the original distribution.
+
+A few other reasons gaussians dominate. Maximum entropy. Among all distributions with a given mean and variance, the gaussian has the highest entropy — the "least committed" distribution. It is the least informative choice for a real valued quantity with a given amount of spread.
+
+Closed form arithmetic. Affine combinations of gaussians stay gaussian. Marginals of gaussians stay gaussian. Conditionals of gaussians stay gaussian. Most distributions break under one of these operations. The gaussian survives all of them. This is what makes gaussian processes and kalman filters tractable.
+
+Conjugacy. The gaussian is conjugate to itself for the mean. Making bayesian updates trivial — covered in notebook six.
+
+Universal approximator status in machine learning. Mixtures of gaussians can approximate any density. Variational families default to gaussians.
+
+The gaussian is not always the right model. But it is almost always the default model. And you should understand exactly when and why it succeeds and fails.
+
+Now the multivariate gaussian. The d dimensional generalization. X drawn from a multivariate gaussian with mean vector mu and covariance matrix capital sigma. Where mu is in R d, and capital sigma is d by d, symmetric, and positive definite.
+
+The p d f is one over the quantity two pi to the d over two, times the square root of the determinant of capital sigma, all multiplied by the exponential of negative one half, times x minus mu, transpose, times capital sigma inverse, times x minus mu.
+
+Reading the pieces. X minus mu, transpose, times capital sigma inverse, times x minus mu, is the mahalanobis distance squared between x and mu. Unlike euclidean distance, this distance accounts for correlation. It stretches and rotates space according to capital sigma. Equal density contours are ellipsoids whose axes align with the eigenvectors of capital sigma.
+
+The square root of the determinant of capital sigma is the volume scaling. Bigger eigenvalues, bigger ellipsoid, smaller peak density. And the two pi to the d over two factor ensures the integral is one.
+
+Special cases. Spherical covariance — capital sigma equals sigma squared, times the identity. Equal variance in every direction, no correlations. Contours are circles or spheres.
+
+Diagonal covariance — capital sigma is the diagonal matrix with sigma sub one squared through sigma sub d squared. Different variances per dimension, but no cross correlation. Contours are axis aligned ellipses.
+
+General covariance — any symmetric positive definite capital sigma. Contours are rotated, stretched ellipses.
+
+This last case is why understanding covariance matrices equals understanding the geometry of multivariate gaussians.
+
+The covariance matrix geometry decoded. For x drawn from a multivariate gaussian, capital sigma sub i i equals the variance of x sub i — variance along axis i. Capital sigma sub i j equals the covariance of x sub i and x sub j — covariance between dimensions i and j. Capital sigma is symmetric and positive definite, always. Otherwise no density exists.
+
+Eigendecomposition. Write capital sigma as q, times capital lambda, times q transpose — using the spectral theorem from the linear algebra repo. Then the eigenvectors, columns of q, are the principal axes of the equal density ellipses. The eigenvalues, diagonal of capital lambda, are the variances along those axes. The lengths of the ellipsoid semi axes are the square roots of the eigenvalues — or some constant multiple, depending on which density level you are picturing.
+
+So principal component analysis on a gaussian cloud finds exactly the axes of the equal density ellipsoids. This is not a coincidence. P c a is the spectral decomposition of the sample covariance matrix.
+
+A handy property — affine transformations. If x is gaussian with mean mu and covariance capital sigma, then for any matrix a and vector b, a times x, plus b, is gaussian with mean a times mu, plus b. And covariance a, times capital sigma, times a transpose.
+
+Gaussian, then linear transformation, equals still gaussian. This is why gaussian processes work, why kalman filters are tractable, and why variational auto encoders use gaussian latents. The math closes nicely.
+
+Now marginal gaussians are gaussian. Partition the random vector as x sub a and x sub b. Partition the parameters in conformable blocks. The mean splits into mu sub a and mu sub b. The covariance splits into four blocks — capital sigma sub a a, capital sigma sub a b, capital sigma sub b a, and capital sigma sub b b.
+
+Then the marginal distribution of x sub a is just gaussian, with mean mu sub a, and covariance capital sigma sub a a.
+
+That is it. Drop the rows and columns for x sub b. The marginal of a gaussian is the corresponding sub gaussian. No integration required. Compare this to general distributions, where marginalization is an integral that may be intractable. The gaussian gives it to you for free.
+
+Now conditional gaussians — the closed form. The single most used result about multivariate gaussians. With the same block partition, the conditional of x sub a given x sub b equals little x sub b, is gaussian with mean mu sub a given b, and covariance capital sigma sub a given b.
+
+The conditional mean. Mu sub a given b equals mu sub a, plus capital sigma sub a b, times capital sigma sub b b inverse, times the quantity little x sub b minus mu sub b.
+
+The conditional covariance. Capital sigma sub a given b equals capital sigma sub a a, minus capital sigma sub a b, times capital sigma sub b b inverse, times capital sigma sub b a.
+
+Two observations worth pausing on. The conditional mean is the unconditional mean mu sub a, plus a correction that is linear in the observed value little x sub b. The slope of that correction is capital sigma sub a b, times capital sigma sub b b inverse — exactly the regression coefficients of x sub a on x sub b. In other words, the conditional mean of a joint gaussian is the best linear regressor.
+
+The conditional covariance does not depend on little x sub b at all. Only on the structure of capital sigma. The uncertainty is the same no matter what we observed. This is a gaussian specific property, and the reason it is so well behaved.
+
+The matrix capital sigma sub a a, minus capital sigma sub a b, times capital sigma sub b b inverse, times capital sigma sub b a, is called the schur complement of capital sigma sub b b in capital sigma. It comes up all over the place in optimization and statistics. This is one of its first big appearances.
+
+A machine learning angle. This formula is the math behind several big ideas. Linear regression closed form — treat x and y as joint gaussian. The conditional mean is the linear regression function. Gaussian processes — train data and test data are jointly gaussian. Predictions are conditional means. Uncertainty estimates are conditional covariances. Kalman filters — each update is a gaussian conditional on observation step using exactly these formulas. Conditional variational auto encoders — some variants use gaussian conditional structures.
+
+Now m l e for gaussian parameters. Given i i d samples x one through x n from a multivariate gaussian with mean mu and covariance capital sigma, the maximum likelihood estimators are clean and intuitive.
+
+Mu hat m l e equals the sample mean — x bar, equal to one over n, times the sum of x sub i.
+
+Capital sigma hat m l e equals one over n, times the sum of x sub i minus x bar, outer product with x sub i minus x bar, transpose. The sample mean estimates the population mean. The sample covariance estimates the population covariance — outer product form, which makes it clearly a sum of rank one matrices.
+
+The n versus n minus one debate. As in the one dimensional case, m l e uses n in the denominator, but it is biased downward. The unbiased estimator uses n minus one, called bessel's correction. For large n the difference is negligible. For small n and in formal statistics, you will see n minus one. Numpy's cov function uses n minus one by default, with d d o f equal to one.
+
+A derivation sketch. The log likelihood is negative n d over two, times log two pi, minus n over two, times log of the determinant of capital sigma, minus one half times the sum of x sub i minus mu, transpose, times capital sigma inverse, times x sub i minus mu.
+
+Set the partial with respect to mu to zero. You get mu hat equals x bar. Set the partial with respect to capital sigma inverse to zero — which is easier than the partial with respect to capital sigma. You get the closed form. The matrix calculus identities from the calculus repo notebook five are exactly what you need.
+
+A note. The m l e for capital sigma requires n at least d to be invertible. With more dimensions than samples, the sample covariance is singular and you need to regularize. For example, add lambda times the identity. This corresponds to a gaussian prior on capital sigma. This is the shrinkage idea behind ledoit wolf and tikhonov regularization.
+
+Let us close with where the gaussian appears in machine learning. Almost everywhere. Of all the distributions in the previous notebook, the gaussian gets its own notebook because it is the most used.
+
+Mean squared error regression. Equivalent to m l e under a gaussian conditional model. Why m s e is the default loss.
+
+Linear discriminant analysis, l d a. Class conditional p of x given y is gaussian per class with shared covariance. Bayes rule recovers a linear classifier.
+
+Quadratic discriminant analysis, q d a. Same as l d a but each class has its own covariance.
+
+Gaussian mixture models. P of x is a weighted sum of gaussians. The gaussian's flexibility comes from mixing.
+
+Principal component analysis. Maximum likelihood projection under a gaussian model with low rank covariance.
+
+Gaussian processes. The output at every input is jointly gaussian. Predictions use the conditional formula directly.
+
+Kalman filters. State estimates are gaussian. Updates are gaussian conditionals on observations. The kalman gain is exactly capital sigma sub a b, times capital sigma sub b b inverse.
+
+Variational auto encoders. Encoder outputs a gaussian over the latent. The prior is standard gaussian. The k l term has closed form because both are gaussian.
+
+Diffusion models. Forward and approximated reverse processes are gaussian. The training objective is a sum of m s e like terms — gaussian log likelihoods.
+
+Laplace approximation. Approximate any posterior by a gaussian at its mode, using the hessian of the log density. Covered in calculus notebook six.
+
+Bayesian linear regression. Gaussian prior plus gaussian likelihood gives a gaussian posterior. Closed form, no sampling needed.
+
+Weight initialization. Xavier and kaiming initializations sample weights from carefully tuned gaussians — variance preserving across layers.
+
+Gaussian noise injection. Dropout, label smoothing, data augmentation often use gaussian noise for analytical tractability.
+
+Normalizing flows. The base distribution is almost always standard gaussian. Flows transform it into something arbitrary while keeping likelihoods tractable.
+
+The reparameterization trick. Sampling z from a gaussian becomes z equals mu, plus cholesky factor l, times standard normal noise epsilon. Gives differentiable samples for variational auto encoders.
+
+The next notebook covers maximum likelihood and bayesian inference. We formalize the m l e we just glimpsed, contrast it with bayesian inference, and connect both back to the loss functions you train with every day.

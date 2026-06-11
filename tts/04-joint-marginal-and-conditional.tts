@@ -1,0 +1,109 @@
+Welcome to notebook four — joint, marginal, and conditional distributions. So far we have worked with one random variable at a time. Real machine learning problems are about many random variables — features, labels, latents — and how they interact. The joint distribution of x and y describes the probability of each combination of values.
+
+For discrete random variables, the joint p m f is p sub x y of x and y, equal to the probability that x equals little x, and y equals little y. It is a table — one entry per combination, all non negative, summing to one.
+
+For continuous random variables, the joint p d f is f sub x y of x and y, such that the probability that the pair x comma y lies in some region a, equals the double integral over that region of f sub x y, d x, d y. The joint is a non negative function that integrates to one over the plane.
+
+For more than two random variables, the same idea — p of x one through x d describes the joint over d random variables. In machine learning this is the object of interest. P of features and labels. P of inputs, latents, and outputs. P of token one through token n.
+
+Why are joints hard? A joint over d binary variables has two to the d, minus one, independent parameters. For d equal to thirty, that is already over a billion. The whole story of probabilistic m l is exploiting structure — independence, low rank, factorization — to make joint distributions tractable.
+
+Now marginal distributions. If you have the joint p of x and y, and you only care about x, you marginalize out y. The marginal p sub x of x equals the sum, over y, of the joint p of x and y. Or, in the continuous case, the integral over y of the joint p d f.
+
+In words — sum or integrate the joint over all values of y. What you get is the distribution of x averaged over y's uncertainty.
+
+Geometrically — collapse the joint table by summing rows or columns. Collapse the joint surface by integrating along one axis.
+
+Marginalization in the wild. The probability that an email is spam, regardless of who sent it, is a marginal over the sender variable. The probability of the next token being "the", regardless of what comes after, is a marginal over later tokens.
+
+In bayesian inference, the evidence — p of d equals the integral of p of d given theta, times p of theta, d theta — is a marginal. We sum out the parameters to get the data's prior predictive likelihood. This integral is the thing that makes bayesian inference hard. And it is why we invent variational and monte carlo methods.
+
+Now conditional distributions. Given the joint, the conditional distribution of y given x equals little x is the joint, divided by the marginal p sub x of x. For discrete, that is the joint p m f over the marginal p m f. For continuous, the joint p d f over the marginal p d f.
+
+In words — fix x equal to little x. Restrict to the slice of the joint corresponding to that fixed value. Renormalize. The result is a real probability distribution over y. It sums to one, or integrates to one, for any fixed x.
+
+A geometric picture. For a two dimensional joint density, slicing along a horizontal line gives a curve as a function of x. That curve, divided by its area, is the conditional density of x given y equal to little y.
+
+The three central formulas of probability, in compact form. The joint p of x and y equals the conditional p of y given x, times the marginal p of x. Memorize this. From it you can derive bayes theorem, marginalization, independence — everything.
+
+A machine learning angle. Every supervised learning model outputs a conditional distribution. Classifiers output p of y given x as a categorical. Regressors output p of y given x as a gaussian, typically centered on the prediction. When a paper says "a probabilistic model of inputs and outputs," they mean a joint p of x and y. When they say "a discriminative model," they mean just the conditional p of y given x. Generative models give you both.
+
+Now independence, in distributional language. We saw event level independence in notebook one. For random variables, the same idea takes a clean factorization form. X is independent of y, written x perp perp y, if and only if the joint p of x and y equals the product of the marginals — p of x, times p of y — for all x and y.
+
+Equivalently — the conditional equals the marginal. P of y given x equals p of y, for all x. Knowing x tells you nothing about y.
+
+Conditional independence. X and y are conditionally independent given z if the joint conditional p of x and y, given z, equals the product of the conditional marginals — p of x given z, times p of y given z. Written x perp perp y given z.
+
+In machine learning this is the more useful notion. Two pixels in an image are not independent. They are correlated through the underlying scene. But, given the latent representation of that scene, they often become approximately independent. That is the modeling idea behind autoencoders and other latent variable models.
+
+Why does factorization matter in practice? A general joint over d variables has order e to the d parameters. But if it factorizes as p of x one, times p of x two given x one, times p of x three given x two — a markov chain — it has only order d parameters. Independence structure is the primary tool for taming high dimensions in probabilistic m l.
+
+Now the chain rule of probability. Every joint distribution factors into a product of conditionals, for any ordering. P of x one through x n equals p of x one, times p of x two given x one, times p of x three given x one and x two, all the way to p of x n given x one through x n minus one.
+
+This is the chain rule of probability. It is exact — no approximation. And it holds for any ordering of the variables. Pick the ordering most convenient for your model.
+
+For machine learning, this is the entire story of autoregressive modeling.
+
+Language models. P of tokens equals the product, over time, of p of the t-th token, given all previous tokens. G p t trains by maximizing this product. Also known as next token prediction.
+
+Autoregressive image models. Pixel by pixel, in raster order. Pixel r n n and pixel c n n.
+
+Autoregressive audio. Wavenet predicts each sample given the past.
+
+Bayesian networks. A directed graph specifies a chain rule factorization where each conditional only depends on the parents in the graph. Exploiting conditional independence to shrink the parameter count.
+
+The chain rule is also what lets us derive bayes theorem. Write p of x and y two ways using the chain rule with x first versus y first. Then equate.
+
+Now conditional expectation. The conditional expectation of y given x equal to little x is the expectation under the conditional distribution. For discrete y, e of y given x equal to x equals the sum, over y, of y times the conditional p m f. For continuous y, e of y given x equal to x equals the integral of y times the conditional p d f, d y.
+
+Two readings. For a fixed value of x, the conditional expectation is a number — the average y over the slice of the joint where x equals that value. As x varies, the conditional expectation becomes a function of x — often written e of y given x, with no specific value. This function is itself a random variable, because it is a function of the random variable x.
+
+A machine learning angle. The optimal regression function under squared loss is exactly the conditional expectation. The function g that minimizes the expectation of y minus g of x, squared, is g star of x equal to the conditional expectation of y given x equal to little x.
+
+This is why mean squared error regression is fitting a model of the conditional mean. Mean prediction, not the whole distribution. Which is why m s e does not capture aleatoric uncertainty.
+
+Similarly, the optimal classification function under cross entropy loss is the conditional class probability. So classifiers approximate conditional class probabilities.
+
+Now the tower property — e of e of y given x, equals e of y. Also called the law of total expectation or iterated expectation.
+
+In words — averaging the conditional means over x gives back the marginal mean of y. If you compute the conditional expectation of y given x equal to little x for every little x, and then average those over the distribution of x, you recover the unconditional expectation of y.
+
+Why is it useful?
+
+Conditioning can be easier than unconditional computation. Some expectations are hard to compute directly but easy once you condition on the right variable. Compute the conditional expectation in closed form, then average over x.
+
+Variance decomposition. A similar identity for variance — variance of y equals the expectation of the conditional variance of y given x, plus the variance of the conditional expectation of y given x. This is the law of total variance, and it splits total variance into noise within groups plus spread between groups. It is the math behind a n o v a, hierarchical models, and the bias variance decomposition.
+
+Monte carlo variance reduction. Rao blackwellization uses the tower property. Replace your noisy estimator g of x and y, with the conditional expectation of g given x. You get the same expectation, but lower or equal variance. Powerful tool in particle filtering and reinforce.
+
+The e m algorithm. The e step computes the conditional expectation of the complete data log likelihood, given the observed data. This conditional expectation is then maximized in the m step.
+
+A machine learning angle. Conditional on the dataset, the parameter estimate is something. Average those out over hypothetical datasets — and you get unconditional bias and variance estimates of the estimator. The tower property is the mechanic that turns conditional analyses into unconditional ones.
+
+Let us close with where joint, marginal, and conditional distributions appear in machine learning. They are the structural backbone of every probabilistic m l model.
+
+Supervised learning. Trying to learn p of y given x — a conditional. Discriminative models stop there. Generative models also model p of x and y jointly, allowing tasks like missing data imputation or sample generation.
+
+Bayes theorem in classification. P of y given x equals p of x given y, times p of y, all divided by p of x. A conditional, derived from joint factorization, with marginalization in the denominator.
+
+Naive bayes. Assumes p of x one through x d, given y, factors as the product of p of x sub i given y. Conditional independence given the class. Cheap, fast, often surprisingly competitive.
+
+Graphical models. Bayesian networks, directed. Markov random fields, undirected. Encode conditional independence structure visually. The joint factorizes according to the graph. Inference algorithms exploit the factorization.
+
+Hidden markov models. Autoregressive on latent states. Forward backward algorithm computes marginals. Viterbi computes the most likely state sequence.
+
+Variational inference. Approximate intractable posteriors p of z given x with tractable q of z given x. The k l divergence between them involves both joint and conditional structure.
+
+Variational auto encoders. Maximize p of x equal to the integral of the joint over z. Direct integration is intractable, so we optimize the evidence lower bound instead.
+
+Diffusion models. The reverse process is a chain of conditional gaussians — p of x at time t minus one, given x at time t. Autoregressive over time, then chain ruled to compute p of x at time zero.
+
+Language models. P of tokens equals the product of conditionals — chain rule, learned with neural networks.
+
+Attention. Soft conditioning. The attention weights compute a softmax of similarities, then aggregate values. Structurally it is an expectation under a conditional distribution over keys.
+
+Conditional generative models. Conditional g a n's, conditional diffusion, image to image models — explicitly factor p of output, given input and noise.
+
+Causal inference. Distinguishes correlation, p of y given x, from causation, p of y given an intervention do of x. By reasoning about which conditional independencies survive interventions.
+
+The next notebook covers the gaussian distribution — the single most used distribution in machine learning, in both its scalar and multivariate forms. We finally do conditioning and marginalization for gaussians, which give surprisingly clean closed forms.

@@ -1,0 +1,109 @@
+Welcome to notebook three — expectation, variance, and moments. The expectation, also called the expected value or mean, of a random variable x is the long run average value if you sampled x infinitely many times. Notationally, capital e of x, or mu sub x.
+
+For discrete x, expectation weights each possible value by its probability and sums. E of x equals the sum, over x, of little x, times the p m f at little x.
+
+For continuous x, replace the sum with an integral. E of x equals the integral of x, times the p d f, d x. This is the same integral we met in the calculus repo. Expectation is integration against a density. It is the mass weighted center of the distribution. The point where, if the p d f were a physical mass distribution, the curve would balance.
+
+A few common expectations to memorize. Bernoulli of p has mean p. Binomial of n and p has mean n times p. Poisson of lambda has mean lambda. Geometric of p has mean one over p. Uniform on a to b has mean a plus b over two. Exponential of lambda has mean one over lambda. Gaussian of mu and sigma squared has mean mu. Beta of alpha and beta has mean alpha divided by alpha plus beta.
+
+These are worth memorizing. They show up constantly.
+
+Given samples x one through x n, the sample mean x bar is one over n, times the sum of x sub i. It is an unbiased estimator of the expectation. The law of large numbers — covered in notebook eight — says x bar converges to e of x as n goes to infinity.
+
+Now linearity of expectation — the single most useful identity in all of probability. E of a x, plus b y, plus c, equals a times e of x, plus b times e of y, plus c.
+
+This holds for any random variables x and y. They do not have to be independent. They do not have to be from the same distribution. They do not have to have anything in common at all. Linearity is unconditional. It is the reason so many obviously hard problems have one line solutions in probability.
+
+Two consequences. E of x plus y equals e of x plus e of y, for any x and y. And e of c times x equals c times e of x, for any constant c.
+
+A classic application. Permute n letters at random. How many letters land back in their original position on average? Define x sub i equal to one if letter i is fixed, else zero. Each x sub i is bernoulli with parameter one over n. The total number of fixed points equals the sum of the x sub i.
+
+By linearity, the expectation of the total equals the sum of the expectations. The sum of one over n, n times. Which equals one. The expected number of fixed points is exactly one, regardless of n. No combinatorial computation needed.
+
+A machine learning angle. The training loss is an expectation over the dataset. By linearity, the gradient of the average equals the average of the gradients. You can compute the gradient of the average by averaging the per sample gradients. That is why stochastic gradient descent works at all.
+
+Now l o t u s — the law of the unconscious statistician. If y equals g of x for some function g, you can compute the expectation of y without first deriving the distribution of y. Just plug g of x into the expectation formula for x.
+
+For discrete x, e of g of x equals the sum, over x, of g of x, times the p m f at x. For continuous x, e of g of x equals the integral of g of x, times the p d f, d x.
+
+This is l o t u s — the law of the unconscious statistician. The name is a joke. Statisticians use it without explicit justification because it is so natural.
+
+L o t u s is why we can compute, say, e of x squared, directly from the distribution of x, rather than having to derive the distribution of x squared. It is the workhorse behind variance, moments, and moment generating functions.
+
+Beware. E of g of x is not equal to g of e of x, in general. This is a common student mistake. If g is non linear, you cannot just push the expectation inside. Jensen's inequality, covered in notebook seven, tells you the direction of the gap. E of g of x is greater than or equal to g of e of x for convex g. Opposite for concave. The reason log of e is not equal to e of log causes endless confusion in variational inference.
+
+Next, variance and standard deviation. Expectation gives you a center. Variance measures how far values typically stray from that center. Variance of x equals the expectation of x minus mu, squared. Which equals e of x squared, minus mu squared.
+
+Both forms are useful. The first is the geometric definition — average squared distance from the mean. The second is the computational formula — often easier in practice. Variance is always non negative.
+
+Standard deviation sigma sub x is the square root of variance. In the same units as x. Which is why it is often reported alongside the mean.
+
+A few common variances to memorize. Bernoulli of p has variance p times one minus p. Binomial of n and p has variance n p times one minus p. Poisson of lambda has variance lambda. Geometric of p has variance one minus p, divided by p squared. Uniform on a to b has variance b minus a squared, divided by twelve. Exponential of lambda has variance one over lambda squared. Gaussian of mu and sigma squared has variance sigma squared. And beta of alpha and beta has variance alpha beta divided by alpha plus beta, squared, times alpha plus beta plus one.
+
+Useful identities. Variance of a constant is zero. Variance of a x plus b equals a squared, times variance of x. The shift b does not affect spread. The scale a enters squared, because variance is in squared units.
+
+A practical note on sample variance. Given data x one through x n, the standard estimator is s squared equals one over n minus one, times the sum of x sub i minus x bar, squared. Note the n minus one denominator. This is called bessel's correction. Using just n would underestimate the true variance, because we are already using x bar — which absorbs some of the variability. N minus one makes the estimator unbiased. Numpy's var function uses n by default. Numpy var with d d o f equal to one uses n minus one.
+
+Now higher moments — skewness and kurtosis. E of x is the first moment. E of x squared is the second moment. Higher moments tell you more about the shape of a distribution beyond center and spread.
+
+Skewness measures asymmetry — how lopsided the distribution is. Skewness of x equals the expectation of x minus mu, divided by sigma, all cubed.
+
+Skewness equal to zero means symmetric — gaussian, uniform, t distribution. Skewness greater than zero means the right tail is longer — exponential, log normal, salary distributions. Skewness less than zero means the left tail is longer — rarer in practice, but some performance scores or ages at death have this shape.
+
+Kurtosis measures tail weight — how heavy the tails are relative to a gaussian. Kurtosis of x equals the expectation of x minus mu, divided by sigma, all to the fourth power.
+
+The more common quantity is called excess kurtosis, which equals the kurtosis minus three. A gaussian has kurtosis exactly three.
+
+Excess kurtosis greater than zero means heavy tails, more extreme outliers than gaussian — like cauchy, t distribution with low degrees of freedom, or financial returns. Excess kurtosis less than zero means light tails, very few outliers — like uniform.
+
+A machine learning angle. Sub gaussian and heavy tailed assumptions appear in modern theory. Gradient noise in stochastic gradient descent has been shown to be heavy tailed, which affects convergence behavior. Principal component analysis assumes gaussian like data and is sensitive to outliers — which kurtosis measures.
+
+Now covariance and correlation. For two random variables x and y, covariance measures their joint variability. Covariance of x and y equals the expectation of x minus mu sub x, times y minus mu sub y. Which also equals e of x y, minus mu sub x, times mu sub y.
+
+Sign tells you the direction of association. Positive — both move up together. Negative — one up, the other down. Zero — no linear association. Magnitude depends on the units of x and y, which is annoying.
+
+Correlation is covariance rescaled to be unit free. Correlation of x and y equals covariance, divided by the product of the standard deviations sigma sub x and sigma sub y. Always between negative one and positive one. Interpretable as — how aligned are x and y after standardizing them? Same direction as covariance, but bounded.
+
+Two crucial facts. Variance of x equals covariance of x with itself. Variance is self covariance. And independence implies zero covariance, but zero covariance does not imply independence. Covariance only sees linear dependence. X uniform on negative one to one, and y equal to x squared, are perfectly determined by each other. But their covariance is zero.
+
+The covariance matrix in the multivariate case. For a vector x with d components, the covariance matrix capital sigma is d by d, with i j entry equal to the covariance of x sub i and x sub j. Always symmetric and positive semidefinite — eigenvalues are non negative. This is the object that principal component analysis decomposes.
+
+Now to the variance of a sum. This identity is everywhere in machine learning — bias variance, ensemble methods, sample mean variance.
+
+Variance of x plus y equals variance of x, plus variance of y, plus two times covariance of x and y.
+
+Special case — independence. If x and y are independent, covariance is zero, and the formula collapses to variance of x plus y, equals variance of x, plus variance of y. For n independent random variables, variance of the sum equals the sum of the variances.
+
+The sample mean. If x one through x n are i i d with variance sigma squared, then x bar n equals one over n, times the sum of x sub i. The variance of x bar n is sigma squared, divided by n. So the standard deviation of x bar n equals sigma, divided by the square root of n.
+
+This is the one over square root of n rate that shows up in monte carlo error, in central limit theorem bounds, in standard errors of regression coefficients — every "average more samples to reduce noise" argument in machine learning. Doubling samples does not double precision. Quadrupling samples does.
+
+The bias variance decomposition, made formal in notebook six. For a regression estimator f hat, the mean squared error at point x equals the squared bias, plus the variance, plus the noise variance.
+
+The decomposition explains why simple models often beat complex ones on small data. Variance dominates when you have too few samples to pin down the model precisely.
+
+Let us close with where expectation, variance, and the related identities appear in machine learning. They are the load bearing math behind most "what is the expected loss, expected reward, expected accuracy" arguments in m l.
+
+Empirical risk minimization. The loss is an expectation. Stochastic gradient descent estimates its gradient via a sample mean. That sample mean's variance is exactly sigma squared over b, where b is the batch size. Doubling batch size halves variance.
+
+Bias variance decomposition. Expected squared error equals squared bias, plus variance, plus noise variance. Explains overfitting, regularization, and the value of more data.
+
+Bagging and ensembles. Average k independent models. Each has variance sigma squared. The ensemble has variance sigma squared over k. By linearity plus independence. Random forests literally exploit this identity.
+
+Boosting. Reduce bias by sequential refinement, instead of variance. The opposite trade off.
+
+Linearity of gradient — the backpropagation math. Gradient of the expectation equals the expectation of the gradient. Mini batch gradients are unbiased estimators of the true gradient, because of linearity of expectation.
+
+Reward shaping in reinforcement learning. The expected return is a sum of discounted rewards. You can transform reward functions in ways that preserve gradient direction. Reinforce baselines exploit this.
+
+Control variates and rao blackwellization. Variance reduction techniques in monte carlo estimation lean on covariance and conditional expectation identities.
+
+Standard errors and confidence intervals. Width of a confidence interval shrinks like sigma over the square root of n. Direct consequence of the variance of sample mean identity.
+
+Calibration and brier scores. Calibration losses are squared deviations between predicted probabilities and outcomes — second moment objects.
+
+G m m, e m, v a e's. All use expectation style e steps to compute responsibility weighted means.
+
+Score functions and reinforce. Gradient of expected return equals expectation of return, times the gradient of log policy. A moment style identity central to policy gradients.
+
+The next notebook covers joint, marginal, and conditional distributions. When more than one random variable matters, and the elegant arithmetic that handles them.
